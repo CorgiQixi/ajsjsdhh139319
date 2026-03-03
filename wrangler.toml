@@ -1,0 +1,18 @@
+name = "chat-backend"
+main = "worker.js"
+compatibility_date = "2024-03-20"
+
+# Durable Object 绑定（必须）
+[durable_objects]
+bindings = [
+  { name = "CHAT_SESSION", class_name = "ChatSession" }
+]
+
+# 迁移配置（必须，告诉 Cloudflare 创建 Durable Object 类）
+[[migrations]]
+tag = "v1"
+new_classes = ["ChatSession"]
+
+# 如果你需要环境变量（例如用户 API 地址），也加上
+[vars]
+USER_API_URL = "https://chatlogin.qixibest.workers.dev/list-users"
