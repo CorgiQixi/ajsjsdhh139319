@@ -26,24 +26,7 @@ export default {
     return stub.fetch(request);
   }
 };
-export default {
-  async fetch(request, env) {
-    const url = new URL(request.url);
-    const sessionId = url.searchParams.get('sessionId');
-    const userId = url.searchParams.get('userId');
 
-    if (!sessionId || !userId) {
-      return new Response('Missing sessionId or userId', { status: 400 });
-    }
-
-    // 根据 sessionId 生成 Durable Object ID（相同 sessionId 映射到同一实例）
-    const id = env.CHAT_SESSION.idFromName(sessionId);
-    const stub = env.CHAT_SESSION.get(id);
-
-    // 转发请求（包括 WebSocket 升级）
-    return stub.fetch(request);
-  }
-};
 
 // ==================== Durable Object 定义 ====================
 export class ChatSession {
