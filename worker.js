@@ -2,6 +2,33 @@
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    
+    // 添加一个调试端点
+    if (url.pathname === '/stats') {
+      const sessionId = url.searchParams.get('sessionId');
+      if (!sessionId) {
+        return new Response('Missing sessionId', { status: 400 });
+      }
+      const id = env.CHAT_SESSION.idFromName(sessionId);
+      const stub = env.CHAT_SESSION.get(id);
+      // 调用 DO 的一个专门方法获取统计信息
+      return stub.fetch(new Request('http://internal/stats', { method: 'GET' }));
+    }
+
+    // 原有的 WebSocket 处理逻辑
+    const sessionId = url.searchParams.get('sessionId');
+    const userId = url.searchParams.get('userId');
+    if (!sessionId || !userId) {
+      return new Response('Missing sessionId or userId', { status: 400 });
+    }
+    const id = env.CHAT_SESSION.idFromName(sessionId);
+    const stub = env.CHAT_SESSION.get(id);
+    return stub.fetch(request);
+  }
+};
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
     const sessionId = url.searchParams.get('sessionId');
     const userId = url.searchParams.get('userId');
 
